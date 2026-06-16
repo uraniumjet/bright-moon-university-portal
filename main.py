@@ -12,10 +12,9 @@ from database.connection import init_db, engine
 from api.v1.router import api_router
 from core.security import verify_password, hash_password
 from models import (
-    UserAccount, StudentProfile, FacultyProfile, 
-    Course, Enrollment, Grade, LmsResource, ServiceRequest, CourseAllocation
+    UserAccount, StudentProfile, FacultyProfile, SupportStaffProfile,
+    Course, CourseAllocation, Enrollment, Grade, LmsResource, ServiceRequest
 )
-
 # Instantiate the FastAPI engine application core
 app = FastAPI(title="The Bright Moon University Portal System")
 
@@ -75,6 +74,10 @@ async def process_portal_authentication(
             return RedirectResponse(url=f"/portal/faculty?user={username}", status_code=303)
         elif user.role == "exam_office":
             return RedirectResponse(url=f"/portal/exam-office?user={username}", status_code=303)
+        elif user.role == "faculty":
+            return RedirectResponse(url=f"/portal/faculty?user={username}", status_code=303)
+        elif user.role == "bursary" or user.role == "non_academic":
+            return RedirectResponse(url=f"/portal/staff?user={username}", status_code=303)
             
     return RedirectResponse(url="/", status_code=303)
 
@@ -205,3 +208,12 @@ async def render_exam_office_dashboard(request: Request, user: str):
         courses_list = [{"code": row[0], "title": row[1]} for row in pending_courses]
         
     return templates.TemplateResponse(request=request, name="exam_office/dashboard.html", context={"admin_id": user, "pending_courses": courses_list})
+
+@app.get("/portal/staff", response_class=HTMLResponse)
+async def render_staff_workspace(request: Request, user: str):
+    """Queries and renders profiles for Bursary and Non-Academic Staff channels."""
+    with Session(engine) as session:
+        staff = session.exec(select(SupportStaffProfile).where(SupportStaffProfile.staff_id == user)).first()
+        if not staff:
+            raise HTTPException(status_code=404, detail="Staff structural identity not found.")
+    return templates.TemplateResponse(request=request, name="staff/dashboard.html", context={"staff": staff})
