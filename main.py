@@ -217,3 +217,30 @@ async def render_staff_workspace(request: Request, user: str):
         if not staff:
             raise HTTPException(status_code=404, detail="Staff structural identity not found.")
     return templates.TemplateResponse(request=request, name="staff/dashboard.html", context={"staff": staff})
+
+@app.get("/api/v1/onboard/records")
+async def get_all_records():
+    """
+    Returns lists of all current active records from temporary memory tables.
+    """
+    return {
+        "students": list(students_db.values()),
+        "staff": list(staff_db.values())
+    }
+
+@app.get("/api/v1/onboard/record/{entity_type}/{entity_id}")
+async def get_single_record(entity_type: str, entity_id: str):
+    """
+    Looks up a targeted student or staff object file using its ID.
+    """
+    if entity_type == "student":
+        record = students_db.get(entity_id)
+    elif entity_type == "staff":
+        record = staff_db.get(entity_id)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid entity type channel request.")
+        
+    if not record:
+        raise HTTPException(status_code=404, detail=f"No record located matching ID {entity_id}")
+        
+    return record

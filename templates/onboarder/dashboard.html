@@ -3,162 +3,629 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bright Moon University - Identity Provisioning Console</title>
+    <title>Bright Moon University - Registrar Command Desk</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased">
+<body class="bg-slate-100 text-slate-800 min-h-screen font-sans antialiased flex flex-col md:flex-row">
 
-    <header class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-lg shadow-inner">
-                <i class="fa-solid fa-user-gear"></i>
+    <!-- 🧭 BRIGHT SIDEBAR CONTROL PANEL -->
+    <aside class="w-full md:w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between shrink-0 shadow-sm z-50">
+        <div>
+            <!-- Header Brand Anchor -->
+            <div class="px-6 py-5 border-b border-slate-200/80 flex items-center gap-3 bg-slate-50/50">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-md shadow-md shadow-blue-200">
+                    <i class="fa-solid fa-moon"></i>
+                </div>
+                <div>
+                    <h1 class="text-xs font-black tracking-widest uppercase text-slate-900">Bright Moon</h1>
+                    <p class="text-[10px] font-mono text-slate-500">KUSIS ERP v2.1</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-md font-black tracking-wider uppercase text-white">Identity Provisioning Control</h1>
-                <p class="text-[11px] font-mono text-gray-500">Operator Session: {{ admin_id }}</p>
+
+            <!-- Identity Segment -->
+            <div class="p-4 mx-3 my-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-1">Active Operator</span>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-xs font-mono text-blue-600 font-bold select-all">{{ admin_id }}</span>
+                </div>
             </div>
+
+            <!-- Navigation Links Routing Desk Matrix -->
+            <nav class="px-3 space-y-1">
+                <button onclick="switchTab('overview')" id="btn-overview" class="w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-blue-600 bg-blue-50/80 border-l-2 border-blue-600 cursor-pointer">
+                    <i class="fa-solid fa-chart-pie text-sm"></i> Portal Overview
+                </button>
+                <button onclick="switchTab('add-student')" id="btn-add-student" class="w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-50 cursor-pointer">
+                    <i class="fa-solid fa-user-graduate text-sm"></i> Admissions (Student)
+                </button>
+                <button onclick="switchTab('add-staff')" id="btn-add-staff" class="w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-50 cursor-pointer">
+                    <i class="fa-solid fa-user-tie text-sm"></i> Appointments (Staff)
+                </button>
+                <button onclick="switchTab('view-records')" id="btn-view-records" class="w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-50 cursor-pointer">
+                    <i class="fa-solid fa-folder-open text-sm"></i> Global Directories
+                </button>
+                <button onclick="switchTab('purge-zone')" id="btn-purge-zone" class="w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-slate-600 hover:text-rose-600 hover:bg-rose-50 cursor-pointer">
+                    <i class="fa-solid fa-shield-halved text-sm"></i> Registry Settings
+                </button>
+            </nav>
         </div>
-        <a href="/" class="text-xs font-bold border border-gray-800 hover:border-rose-500/30 bg-gray-950 text-gray-400 hover:text-rose-400 px-4 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2">
-            <i class="fa-solid fa-power-off text-[10px]"></i> Terminate Session
-        </a>
-    </header>
 
-    <main class="max-w-6xl mx-auto p-4 sm:p-8 space-y-8">
-
-        <div id="responseAlert" class="hidden max-w-2xl mx-auto p-4 rounded-xl border flex items-start gap-3.5 animate-fadeIn">
-            <div id="alertIcon" class="text-base pt-0.5"></div>
-            <div class="flex-1">
-                <h4 id="alertTitle" class="text-xs font-bold uppercase tracking-wider"></h4>
-                <p id="alertBody" class="text-xs mt-1 leading-relaxed font-mono select-all text-gray-300"></p>
-            </div>
-            <button onclick="closeAlert()" class="text-gray-500 hover:text-gray-400 text-xs focus:outline-none cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+        <!-- Disconnect Loop Link -->
+        <div class="p-4 border-t border-slate-200/80 bg-slate-50/50">
+            <a href="/" class="w-full text-center block text-xs font-bold border border-slate-200 hover:border-rose-200 bg-white text-slate-600 hover:text-rose-600 py-2.5 rounded-xl transition-all cursor-pointer shadow-sm">
+                <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Terminate Session
+            </a>
         </div>
+    </aside>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- 🚀 BRIGHT MAIN APP CONTAINER VIEWPORT WORKSPACE -->
+    <main class="flex-1 min-w-0 bg-slate-50 flex flex-col">
+        
+        <!-- TOP APP BAR LINK STATS FEED -->
+        <header class="bg-white border-b border-slate-200/80 px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+            <h2 id="view-title" class="text-sm font-black uppercase tracking-wider text-slate-800">Portal Overview</h2>
+            <span class="text-[10px] font-mono bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200 text-slate-600 uppercase"><i class="fa-solid fa-vault mr-1"></i> Cloud Registry Active</span>
+        </header>
 
-            <section class="bg-gray-900 border border-gray-800/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
-                <div class="border-b border-gray-800 pb-3 flex items-center gap-3">
-                    <span class="text-indigo-400 text-lg"><i class="fa-solid fa-user-graduate"></i></span>
-                    <div>
-                        <h3 class="text-sm font-bold text-gray-200 tracking-wide">Onboard Matriculating Student</h3>
-                        <p class="text-[11px] text-gray-500 mt-0.5">Generates a unique calendar-bound ID and a temporary password key.</p>
+        <!-- SUB-VIEW CONTEXT CHANNELS INNER SHELL -->
+        <div class="p-4 sm:p-8 flex-1 overflow-y-auto max-w-5xl w-full mx-auto space-y-6">
+
+            <!-- 🔔 GLOBAL NOTIFICATION MESSENGER BOARD -->
+            <div id="responseAlert" class="hidden p-4 rounded-xl border flex items-start gap-3.5 transition-all shadow-md animate-fadeIn">
+                <div id="alertIcon" class="text-base pt-0.5"></div>
+                <div class="flex-1">
+                    <h4 id="alertTitle" class="text-xs font-bold uppercase tracking-wider"></h4>
+                    <p id="alertBody" class="text-xs mt-1 leading-relaxed font-mono text-slate-600"></p>
+                </div>
+                <button onclick="closeAlert()" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB CHANNEL 1: GENERAL MONITOR OVERVIEW  -->
+            <!-- ========================================== -->
+            <div id="tab-overview" class="tab-content space-y-6">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden">
+                    <div class="space-y-2 text-center md:text-left">
+                        <h3 class="text-lg font-black text-slate-900">Welcome Back, Registrar Controller</h3>
+                        <p class="text-xs text-slate-500 max-w-lg leading-relaxed">You are currently logged into the Central Registry Deck. Use the navigation panel on the left to create student profiles, onboard new faculty members, or search and update records.</p>
+                    </div>
+                    <div class="flex gap-3 shrink-0">
+                        <button onclick="switchTab('add-student')" class="text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl transition-all shadow-sm cursor-pointer flex items-center gap-2 uppercase tracking-wide">
+                            <i class="fa-solid fa-user-plus"></i> Admit Student
+                        </button>
+                        <button onclick="switchTab('view-records')" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 px-4 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-2 uppercase tracking-wide">
+                            <i class="fa-solid fa-folder-open"></i> Browse Folders
+                        </button>
                     </div>
                 </div>
 
-                <form id="studentForm" onsubmit="submitProvisioning(event, '/api/v1/onboard/student')" class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1.5">Candidate Full Name</label>
-                        <input type="text" name="name" required placeholder="e.g., Yusuf Ahmad Shehu"
-                               class="w-full text-xs bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-all font-medium text-white">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div><span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">Student Ledger</span><span class="text-lg font-black font-mono text-slate-900">Live Profiles</span></div>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1.5">Assigned Faculty Group</label>
-                            <input type="text" name="faculty" required placeholder="e.g., Science & Engineering"
-                                   class="w-full text-xs bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-all text-white">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1.5">Course Specialization</label>
-                            <input type="text" name="specialization" required placeholder="e.g., Cyber Security & AI"
-                                   class="w-full text-xs bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-all text-white">
-                        </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-chalkboard-user"></i></div>
+                        <div><span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">Faculty Staff</span><span class="text-lg font-black font-mono text-slate-900">Assigned Roles</span></div>
                     </div>
-
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1.5">Academic Degree Tier</label>
-                        <select name="level" class="w-full text-xs bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-all text-gray-300">
-                            <option value="B.Sc.">Undergraduate Track (B.Sc.)</option>
-                            <option value="M.Sc.">Postgraduate Master Track (M.Sc.)</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="w-full text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl transition-all shadow-md shadow-indigo-950/40 flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-user-plus"></i> Generate Matriculation Profile
-                    </button>
-                </form>
-            </section>
-
-            <section class="bg-gray-900 border border-gray-800/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
-                <div class="border-b border-gray-800 pb-3 flex items-center gap-3">
-                    <span class="text-emerald-400 text-lg"><i class="fa-solid fa-chalkboard-user"></i></span>
-                    <div>
-                        <h3 class="text-sm font-bold text-gray-200 tracking-wide">Onboard Appointed Faculty Staff</h3>
-                        <p class="text-[11px] text-gray-500 mt-0.5">Establishes instructional lecturer identity records across domains.</p>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg"><i class="fa-solid fa-building-columns"></i></div>
+                        <div><span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">Total Faculties</span><span class="text-lg font-black font-mono text-slate-900">Active Map</span></div>
                     </div>
                 </div>
+            </div>
 
-                <form id="facultyForm" onsubmit="submitProvisioning(event, '/api/v1/onboard/faculty')" class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1.5">Lecturer Full Name</label>
-                        <input type="text" name="name" required placeholder="e.g., Dr. Abdullahi Sani Jibril"
-                               class="w-full text-xs bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-all font-medium text-white">
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- ========================================== -->
+            <!-- TAB CHANNEL 2: STUDENT ADMISSIONS MODULE    -->
+            <!-- ========================================== -->
+            <div id="tab-add-student" class="tab-content hidden">
+                <section class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+                    <div class="border-b border-slate-100 pb-3 flex items-center gap-3">
+                        <span class="text-blue-600 text-lg"><i class="fa-solid fa-graduation-cap"></i></span>
                         <div>
-                            <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1.5">Primary Department</label>
-                            <input type="text" name="department" required placeholder="e.g., Computer Science"
-                                   class="w-full text-xs bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-all text-white">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1.5">Official Academic Rank</label>
-                            <input type="text" name="rank" required placeholder="e.g., Senior Lecturer"
-                                   class="w-full text-xs bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 transition-all text-white">
+                            <h3 class="text-sm font-bold text-slate-800 tracking-wide">Register New Matriculating Student</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Captures biological details, filters options, and sets up residential tracking.</p>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl transition-all shadow-md shadow-emerald-950/40 flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-id-card"></i> Provision Faculty Profile
-                    </button>
-                </form>
-            </section>
+                    <form onsubmit="fireCRUDAction(event, '/api/v1/onboard/student')" class="space-y-4">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Legal Full Name</label>
+                                <input type="text" name="name" required placeholder="Yusuf Ahmad Shehu" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-900">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Age</label>
+                                <input type="number" name="age" required min="16" placeholder="24" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-900">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Biological Sex</label>
+                                <select name="sex" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Academic Degree Tier</label>
+                                <select name="level" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700">
+                                    <option value="Diploma">Diploma Track</option>
+                                    <option value="HND">Higher National Diploma (HND)</option>
+                                    <option value="B.Sc.">B.Sc. Undergraduate Track</option>
+                                    <option value="B.Eng.">B.Eng. Engineering Track</option>
+                                    <option value="M.Sc.">M.Sc. Postgraduate Track</option>
+                                    <option value="Ph.D.">Ph.D. Doctorate Block</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Primary Faculty Anchor</label>
+                                <select id="studentFacultySelect" name="faculty" onchange="cascadeDepartmentFilter(this.value, 'studentDeptSelect')" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700">
+                                    <option value="">-- Choose Faculty Cluster --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Course Specialization / Department</label>
+                                <select id="studentDeptSelect" name="department" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-700">
+                                    <option value="">-- Awaiting Faculty Option --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Mobile Number</label>
+                                <input type="text" name="phone" required placeholder="+23480..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-900">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Personal Email Address</label>
+                                <input type="email" name="email" required placeholder="candidate@gmail.com" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 text-slate-900">
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                            <span class="text-[10px] uppercase font-black tracking-widest text-blue-600 block"><i class="fa-solid fa-shield-heart mr-1"></i> Emergency Ledger / Next of Kin Contacts</span>
+                            <div class="grid grid-cols-3 gap-3">
+                                <input type="text" name="guardian_name" required placeholder="Guardian Full Name" class="col-span-1 text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none text-slate-900">
+                                <input type="text" name="guardian_phone" required placeholder="Guardian Mobile Link" class="col-span-1 text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none text-slate-900">
+                                <input type="text" name="guardian_relation" required placeholder="Relation (e.g. Father)" class="col-span-1 text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none text-slate-900">
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-[10px] uppercase font-bold tracking-widest text-slate-500 flex items-center gap-2">
+                                    <i class="fa-solid fa-hotel text-blue-600"></i> Boarding On-Campus Hostel Resident
+                                </label>
+                                <input type="checkbox" name="is_boarding" value="true" onchange="toggleHostelFields(this.checked)" class="w-4 h-4 rounded border-slate-300 text-blue-600 bg-white focus:ring-0 cursor-pointer">
+                            </div>
+                            <div id="hostelFieldsBlock" class="hidden grid grid-cols-2 gap-4 pt-1">
+                                <input type="text" id="hostelBlock" name="hostel_block" placeholder="Hostel Block Name (e.g. Titanium Hall)" class="text-xs bg-white border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none text-slate-900">
+                                <input type="text" id="roomNumber" name="room_number" placeholder="Target Room (e.g. Room-404)" class="text-xs bg-white border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none text-slate-900">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer font-black uppercase tracking-wider">
+                            <i class="fa-solid fa-id-card-clip"></i> Issue Student Credentials
+                        </button>
+                    </form>
+                </section>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB CHANNEL 3: APPOINTMENTS MODULE (STAFF) -->
+            <!-- ========================================== -->
+            <div id="tab-add-staff" class="tab-content hidden">
+                <section class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+                    <div class="border-b border-slate-100 pb-3 flex items-center gap-3">
+                        <span class="text-emerald-600 text-lg"><i class="fa-solid fa-user-shield"></i></span>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 tracking-wide">Appoint Faculty & Non-Academic Staff</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Provisions identities for Instructors, Finance Personnel, and administrators.</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="fireCRUDAction(event, '/api/v1/onboard/staff')" class="space-y-4">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Official Full Name</label>
+                                <input type="text" name="name" required placeholder="Dr. Abdullahi Sani Jibril" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-900">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Age</label>
+                                <input type="number" name="age" required min="22" placeholder="42" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-900">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Biological Sex</label>
+                                <select name="sex" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-700">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Assigned Sector Group</label>
+                                <select id="staffDeptSelect" name="department" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-700">
+                                    <option value="Bursary">Bursary Office (Finance)</option>
+                                    <option value="Registry">Registry Department</option>
+                                    <option value="IT Support">Systems & Network Security IT</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Official Title / Appointed Position</label>
+                                <input type="text" name="role" required placeholder="e.g. Senior Lecturer" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-900">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Office Desk Cabin Code</label>
+                                <input type="text" name="cabin" required placeholder="e.g. AdminBlock-Room 12" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-900">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Direct Mobile Contact</label>
+                                <input type="text" name="phone" required placeholder="+23470..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-900">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Corporate Email Link</label>
+                                <input type="email" name="email" required placeholder="staff@brightmoon.edu.ng" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 text-slate-900">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer font-black uppercase tracking-wider">
+                            <i class="fa-solid fa-id-card"></i> Issue Staff Operational Profile
+                        </button>
+                    </form>
+                </section>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 📁 TAB CHANNEL 4: GLOBAL RECORD VIEWER MAP -->
+            <!-- ========================================== -->
+            <div id="tab-view-records" class="tab-content hidden space-y-4">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-850 tracking-wide">Institutional Master Folders</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Click on any registered entity row below to inspect complete profile logs.</p>
+                        </div>
+                        <!-- Mini Tab Directory Toggle -->
+                        <div class="bg-slate-100 p-1 rounded-xl flex gap-1 border border-slate-200/60 self-start">
+                            <button onclick="toggleDirectorySubTab('student')" id="subbtn-student" class="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg bg-white text-blue-600 shadow-sm cursor-pointer transition-all">Students</button>
+                            <button onclick="toggleDirectorySubTab('staff')" id="subbtn-staff" class="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 cursor-pointer transition-all">Faculty & Staff</button>
+                        </div>
+                    </div>
+
+                    <!-- STUDENT SUB-DIRECTORY LEDGER TABLE -->
+                    <div id="directory-student-block" class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-[10px] uppercase tracking-wider font-bold text-slate-400 bg-slate-50/50">
+                                    <th class="py-3 px-4">Identification ID</th>
+                                    <th class="py-3 px-4">Full Legal Name</th>
+                                    <th class="py-3 px-4">Faculty / Dept</th>
+                                    <th class="py-3 px-4">Degree Track</th>
+                                    <th class="py-3 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody" class="text-xs divide-y divide-slate-100 font-mono text-slate-700">
+                                <!-- Generated Asynchronously -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- STAFF SUB-DIRECTORY LEDGER TABLE -->
+                    <div id="directory-staff-block" class="overflow-x-auto hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-[10px] uppercase tracking-wider font-bold text-slate-400 bg-slate-50/50">
+                                    <th class="py-3 px-4">Staff ID</th>
+                                    <th class="py-3 px-4">Official Name</th>
+                                    <th class="py-3 px-4">Department</th>
+                                    <th class="py-3 px-4">Appointed Role</th>
+                                    <th class="py-3 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffTableBody" class="text-xs divide-y divide-slate-100 font-mono text-slate-700">
+                                <!-- Generated Asynchronously -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB CHANNEL 5: ACCOUNT PURGE & CONTROL     -->
+            <!-- ========================================== -->
+            <div id="tab-purge-zone" class="tab-content hidden">
+                <section class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex items-center gap-3">
+                        <span class="text-rose-600 text-lg"><i class="fa-solid fa-dumpster-fire"></i></span>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 tracking-wide">Administrative Account Purge Dashboard</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Instantly revokes profile access credentials and completely deletes users.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 max-w-xl">
+                        <input type="text" id="purgeUserId" placeholder="ENTER ID TO PURGE (e.g. UR-2026-0001)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-500 font-mono tracking-wider text-slate-900 uppercase placeholder-slate-400">
+                        <button onclick="executePurgeRequest()" class="bg-rose-50 border border-rose-200 hover:bg-rose-600 text-rose-700 hover:text-white font-black uppercase tracking-wider text-xs px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap">
+                            <i class="fa-solid fa-trash-can"></i> Terminate Account
+                        </button>
+                    </div>
+                </section>
+            </div>
 
         </div>
     </main>
 
+    <!-- 🕵️‍♂️ MODAL DRAWER OVERLAY PANEL FOR DEEP RECORD INSPECION -->
+    <div id="inspectModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl animate-fadeIn overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-id-card"></i></div>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-800" id="inspectTitle">Profile Dossier</h3>
+                </div>
+                <button onclick="closeInspectModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4" id="inspectContainer">
+                <!-- Data Fields Loaded Dynamically -->
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
+                <button onclick="closeInspectModal()" class="text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-xl cursor-pointer shadow-sm">Dismiss Dossier</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌐 INTEGRATED DASHBOARD MATRIX CONTROLLER PIPELINE -->
     <script>
-        async function submitProvisioning(event, endpointUrl) {
+        let globalInstitutionalMap = {};
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-50 cursor-pointer";
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (tabId === 'purge-zone') {
+                activeBtn.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-rose-600 bg-rose-50 border-l-2 border-rose-600 cursor-pointer";
+            } else {
+                activeBtn.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-blue-600 bg-blue-50/80 border-l-2 border-blue-600 cursor-pointer";
+            }
+
+            const titleMap = {
+                'overview': 'Portal Overview Monitor',
+                'add-student': 'Admissions Operations (Student Registry)',
+                'add-staff': 'Appointments Desk (Staff Profile Onboarding)',
+                'view-records': 'Institutional Directory Ledger Control Room',
+                'purge-zone': 'Registry Settings & Governance Access Keys'
+            };
+            document.getElementById('view-title').innerText = titleMap[tabId];
+
+            if (tabId === 'view-records') { fetchInstitutionalRecords(); }
+        }
+
+        function toggleDirectorySubTab(type) {
+            if(type === 'student') {
+                document.getElementById('directory-student-block').classList.remove('hidden');
+                document.getElementById('directory-staff-block').classList.add('hidden');
+                document.getElementById('subbtn-student').className = "text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg bg-white text-blue-600 shadow-sm cursor-pointer transition-all";
+                document.getElementById('subbtn-staff').className = "text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 cursor-pointer transition-all";
+            } else {
+                document.getElementById('directory-student-block').classList.add('hidden');
+                document.getElementById('directory-staff-block').classList.remove('hidden');
+                document.getElementById('subbtn-student').className = "text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 cursor-pointer transition-all";
+                document.getElementById('subbtn-staff').className = "text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg bg-white text-emerald-600 shadow-sm cursor-pointer transition-all";
+            }
+        }
+
+        // Fetch schema mapping parameters during dashboard startup boot
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const response = await fetch("/api/v1/onboard/faculties-map");
+                globalInstitutionalMap = await response.json();
+                
+                const studentFacultySelect = document.getElementById("studentFacultySelect");
+                const staffDeptSelect = document.getElementById("staffDeptSelect");
+                
+                for (const faculty in globalInstitutionalMap) {
+                    let option = new Option(faculty, faculty);
+                    studentFacultySelect.add(option);
+                    
+                    globalInstitutionalMap[faculty].forEach(dept => {
+                        let staffOpt = new Option(`Academic: ${dept}`, dept);
+                        staffDeptSelect.add(staffOpt);
+                    });
+                }
+            } catch (err) {
+                console.error("Critical Failure: Could not bind cascade maps.", err);
+            }
+        });
+
+        // Pull active entries safely from local database tables
+        async function fetchInstitutionalRecords() {
+            try {
+                const response = await fetch("/api/v1/onboard/records");
+                const records = await response.json();
+
+                // Populate Student Sub-ledger rows
+                const studentBody = document.getElementById("studentTableBody");
+                studentBody.innerHTML = records.students.length === 0 
+                    ? `<tr><td colspan="5" class="py-4 text-center text-slate-400 font-sans italic">No students registered in this cluster yet.</td></tr>`
+                    : records.students.map(s => `
+                        <tr class="hover:bg-slate-50/80 transition-all border-b border-slate-100">
+                            <td class="py-3 px-4 font-bold text-blue-600">${s.generated_id}</td>
+                            <td class="py-3 px-4 text-slate-900 font-sans font-medium">${s.name}</td>
+                            <td class="py-3 px-4 text-[11px]">${s.faculty} / ${s.department}</td>
+                            <td class="py-3 px-4"><span class="bg-slate-100 text-slate-600 font-sans px-2 py-0.5 rounded border border-slate-200 text-[11px]">${s.level}</span></td>
+                            <td class="py-3 px-4 text-right">
+                                <button onclick="inspectRowRecord('student', '${s.generated_id}')" class="text-[11px] font-bold bg-white text-blue-600 border border-slate-200 hover:border-blue-300 px-2.5 py-1 rounded-lg cursor-pointer shadow-sm transition-all"><i class="fa-solid fa-eye"></i> View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                // Populate Staff Sub-ledger rows
+                const staffBody = document.getElementById("staffTableBody");
+                staffBody.innerHTML = records.staff.length === 0
+                    ? `<tr><td colspan="5" class="py-4 text-center text-slate-400 font-sans italic">No staff profiles provisioned yet.</td></tr>`
+                    : records.staff.map(st => `
+                        <tr class="hover:bg-slate-50/80 transition-all border-b border-slate-100">
+                            <td class="py-3 px-4 font-bold text-emerald-600">${st.generated_id}</td>
+                            <td class="py-3 px-4 text-slate-900 font-sans font-medium">${st.name}</td>
+                            <td class="py-3 px-4 text-[11px]">${st.department}</td>
+                            <td class="py-3 px-4 text-slate-500 font-sans font-medium">${st.role}</td>
+                            <td class="py-3 px-4 text-right">
+                                <button onclick="inspectRowRecord('staff', '${st.generated_id}')" class="text-[11px] font-bold bg-white text-emerald-600 border border-slate-200 hover:border-emerald-300 px-2.5 py-1 rounded-lg cursor-pointer shadow-sm transition-all"><i class="fa-solid fa-eye"></i> View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+            } catch (err) {
+                console.error("Failed to read server live data registers.", err);
+            }
+        }
+
+        // Fire single object target inspection modals lookup queries
+        async function inspectRowRecord(type, entityId) {
+            try {
+                const response = await fetch(`/api/v1/onboard/record/${type}/${entityId}`);
+                if (!response.ok) throw new Error("Could not load target file records mapping.");
+                const data = await response.json();
+
+                document.getElementById('inspectTitle').innerText = `${type.toUpperCase()} PROFILE DOSSIER: ${entityId}`;
+                const container = document.getElementById('inspectContainer');
+                
+                let detailsHtml = `
+                    <div class="grid grid-cols-2 gap-y-3 gap-x-4 border border-slate-200 p-4 rounded-xl bg-slate-50 font-sans">
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Full Legal Name</span><strong class="text-xs text-slate-800">${data.name}</strong></div>
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Age / Gender</span><strong class="text-xs text-slate-800">${data.age} Yrs / ${data.sex}</strong></div>
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Mobile Link</span><strong class="text-xs text-slate-800 font-mono">${data.phone}</strong></div>
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Email Address</span><strong class="text-xs text-slate-800 break-all font-mono">${data.email}</strong></div>
+                `;
+
+                if(type === 'student') {
+                    detailsHtml += `
+                        <div class="col-span-2 border-t border-slate-200 pt-2"><span class="text-[10px] text-slate-400 uppercase block font-bold">Faculty Anchor</span><strong class="text-xs text-slate-800">${data.faculty} (${data.department})</strong></div>
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Degree Tier</span><strong class="text-xs text-slate-800">${data.level}</strong></div>
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Hostel Resident</span><strong class="text-xs text-slate-800">${data.is_boarding ? `<i class="fa-solid fa-hotel text-blue-600"></i> ${data.hostel_block} - ${data.room_number}` : 'Off-Campus'}</strong></div>
+                        <div class="col-span-2 border-t border-slate-200 pt-2 bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+                            <span class="text-[9px] text-blue-600 uppercase block font-black tracking-wider"><i class="fa-solid fa-shield-heart"></i> Next of Kin Contact</span>
+                            <p class="text-xs text-slate-700 mt-0.5 font-medium">${data.guardian_name} (${data.guardian_relation})</p>
+                            <p class="text-[11px] font-mono text-slate-500 mt-0.5">${data.guardian_phone}</p>
+                        </div>
+                    `;
+                } else {
+                    detailsHtml += `
+                        <div class="col-span-2 border-t border-slate-200 pt-2"><span class="text-[10px] text-slate-400 uppercase block font-bold">Department / Division</span><strong class="text-xs text-slate-800">${data.department}</strong></div>
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Appointed Position</span><strong class="text-xs text-slate-800">${data.role}</strong></div>
+                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Office Desk Cabin</span><strong class="text-xs text-slate-800">${data.cabin}</strong></div>
+                    `;
+                }
+
+                detailsHtml += `</div>`;
+                container.innerHTML = detailsHtml;
+                document.getElementById('inspectModal').classList.remove('hidden');
+            } catch (err) {
+                alert("Could not load target asset records profile logs: " + err.message);
+            }
+        }
+
+        function closeInspectModal() { document.getElementById('inspectModal').classList.add('hidden'); }
+        function cascadeDepartmentFilter(selectedFaculty, targetDropdownId) {
+            const deptDropdown = document.getElementById(targetDropdownId);
+            deptDropdown.length = 0; 
+            if (!selectedFaculty || !globalInstitutionalMap[selectedFaculty]) {
+                deptDropdown.add(new Option("-- Awaiting Faculty Options --", ""));
+                return;
+            }
+            globalInstitutionalMap[selectedFaculty].forEach(department => {
+                deptDropdown.add(new Option(department, department));
+            });
+        }
+
+        function toggleHostelFields(isChecked) {
+            const block = document.getElementById("hostelFieldsBlock");
+            if (isChecked) { block.classList.remove("hidden"); } else { block.classList.add("hidden"); }
+        }
+
+        async function fireCRUDAction(event, endpointUrl) {
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
-            
             const alertBox = document.getElementById('responseAlert');
             const alertIcon = document.getElementById('alertIcon');
             const alertTitle = document.getElementById('alertTitle');
             const alertBody = document.getElementById('alertBody');
 
             try {
-                const response = await fetch(endpointUrl, {
-                    method: 'POST',
-                    body: formData
-                });
-                
+                const response = await fetch(endpointUrl, { method: 'POST', body: formData });
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Update Alert view state to Success Mode
-                    alertBox.className = "max-w-2xl mx-auto p-4 rounded-xl border bg-emerald-950/40 border-emerald-900/40 text-emerald-300 flex items-start gap-3.5 animate-fadeIn";
-                    alertIcon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-                    alertTitle.innerText = "Identity Record Created Cleanly";
-                    alertBody.innerHTML = `Generated ID: <strong>${data.generated_id}</strong> <br> Temporary Secret Pass Token: <strong>${data.temporary_password}</strong> <br><span class="text-[10px] text-gray-400 mt-2 block">(Copied this token allocation for the user profile login validation check.)</span>`;
+                    alertBox.className = "p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
+                    alertIcon.innerHTML = '<i class="fa-solid fa-square-check text-xl text-emerald-600"></i>';
+                    alertTitle.innerText = "Identity Profile Generated Smoothly";
+                    alertBody.innerHTML = `ASSIGNED ACCESS ID: <strong class="text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${data.generated_id}</strong><br>TEMPORARY ENCRYPTED PASSWORD: <strong class="text-slate-900">Password123</strong>`;
                     form.reset();
+                    toggleHostelFields(false);
                 } else {
-                    throw new Error(data.detail || "System processing error during identity compilation.");
+                    throw new Error(data.detail || "Server request processing rejection triggered.");
                 }
-            } catch (error) {
-                // Update Alert view state to Error Mode
-                alertBox.className = "max-w-2xl mx-auto p-4 rounded-xl border bg-rose-950/40 border-rose-900/40 text-rose-300 flex items-start gap-3.5 animate-fadeIn";
-                alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
-                alertTitle.innerText = "Provisioning Interrupted";
-                alertBody.innerText = error.message;
+            } catch (err) {
+                alertBox.className = "p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
+                alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xl text-rose-600"></i>';
+                alertTitle.innerText = "Operation Aborted";
+                alertBody.innerText = err.message;
             }
         }
 
-        function closeAlert() {
-            document.getElementById('responseAlert').classList.add('hidden');
+        async function executePurgeRequest() {
+            const targetInput = document.getElementById("purgeUserId");
+            const userId = targetInput.value.trim().toUpperCase();
+            if(!userId) return;
+            if(!confirm(`Confirm absolute account purge target: ${userId}?`)) return;
+
+            const alertBox = document.getElementById('responseAlert');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertTitle = document.getElementById('alertTitle');
+            const alertBody = document.getElementById('alertBody');
+
+            try {
+                const response = await fetch(`/api/v1/onboard/delete/${userId}`, { method: 'DELETE' });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alertBox.className = "p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
+                    alertIcon.innerHTML = '<i class="fa-solid fa-trash-can text-xl text-rose-600"></i>';
+                    alertTitle.innerText = "Purge Execution Sequence Finalized";
+                    alertBody.innerText = data.message;
+                    targetInput.value = "";
+                } else {
+                    throw new Error(data.detail || "Error running account processing purge.");
+                }
+            } catch (err) {
+                alertBox.className = "p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
+                alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xl text-rose-600"></i>';
+                alertTitle.innerText = "Purge Sequence Cancelled";
+                alertBody.innerText = err.message;
+            }
         }
+
+        function closeAlert() { document.getElementById('responseAlert').className = "hidden"; }
     </script>
 </body>
 </html>
