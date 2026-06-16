@@ -1,55 +1,115 @@
 """
-The Bright Moon University - Core Academic Relational Blueprint
+The Bright Moon University - Expanded Academic & Institutional Relational Blueprint
 File: models/academic.py
-Description: Maps Students, Faculties, Courses, Enrollments, and Grade Approval matrices.
+Description: Models expanded with deep biometrics, diverse degree options, and staff definitions.
 """
 
-from typing import Optional, List
-from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional
+from sqlmodel import SQLModel, Field
 
 class StudentProfile(SQLModel, table=True):
-    """Primary identity matrix for matriculated student candidates."""
+    """Deep structural identity matrix for matriculated student candidates."""
     id: Optional[int] = Field(default=None, primary_key=True)
-    student_id: str = Field(unique=True, index=True) # Maps directly to UserAccount.username
+    student_id: str = Field(unique=True, index=True) # Unified login link reference
     student_name: str
-    faculty_name: str # e.g., "Science & Engineering"
+    age: int
+    sex: str # "Male" or "Female"
+    profile_pic: str # Storage target: /storage/avatars/students/id.jpg
+    
+    # Academic Placement Blocks
+    header_faculty: str # e.g., "Faculty of Science & Engineering"
     course_specialization: str # e.g., "Cyber Security & AI"
-    academic_level: str # e.g., "B.Sc.", "M.Sc."
+    academic_level: str # "Diploma", "HND", "B.Sc.", "B.Eng.", "B.A.", "M.Sc.", "Ph.D."
     current_semester: int = Field(default=1)
-    attendance_pct: float = Field(default=100.0) # Background data stream for Pandas risk checks
+    attendance_pct: float = Field(default=100.0)
+    
+    # Communications Ledgers
+    phone_number: str
+    email_address: str
+    
+    # Emergency Ledger / Next of Kin
+    guardian_name: str
+    guardian_phone: str
+    guardian_relation: str # e.g., "Father", "Sponsor"
+    
+    # Integrated Residential Architecture Parameters
+    is_boarding: bool = Field(default=False)
+    hostel_block: Optional[str] = Field(default=None) 
+    room_number: Optional[str] = Field(default=None)   
+
 
 class FacultyProfile(SQLModel, table=True):
-    """Identity matrix for appointed lecturing staff."""
+    """Deep identity matrix for appointed instructional lecturing staff."""
     id: Optional[int] = Field(default=None, primary_key=True)
-    faculty_id: str = Field(unique=True, index=True) # Maps directly to UserAccount.username
+    faculty_id: str = Field(unique=True, index=True) 
     faculty_name: str
-    department: str
-    academic_rank: str # e.g., "Professor", "Senior Lecturer"
+    age: int
+    sex: str
+    profile_pic: str # Target: /storage/avatars/faculty/id.jpg
+    
+    # Institutional Placements
+    department: str # e.g., "Cyber Security & AI"
+    academic_rank: str # e.g., "Associate Professor", "Senior Lecturer"
+    office_cabin: str # e.g., "TechHub-Cabin 4B"
+    
+    # Communications Deck
+    phone_number: str
+    email_address: str
+
+
+class SupportStaffProfile(SQLModel, table=True):
+    """
+    Identity matrix for Non-Academic & Bursary Staff.
+    Keeps the database extensible without modifying Student or Faculty logic.
+    """
+    id: Optional[int] = Field(default=None, primary_key=True)
+    staff_id: str = Field(unique=True, index=True) # Unified login link reference
+    staff_name: str
+    age: int
+    sex: str
+    profile_pic: str # Target: /storage/avatars/staff/id.jpg
+    
+    # Operational Placement
+    department: str # "Bursary", "Registry", "Security", "Maintenance", "IT Support"
+    assigned_role: str # e.g., "Chief Accountant", "Network Administrator"
+    office_cabin: str
+    
+    # Communications Deck
+    phone_number: str
+    email_address: str
+
+
+# =========================================================================
+# CORE ACADEMIC MODULES & EVALUATION MATRIX STRUCTURES
+# =========================================================================
 
 class Course(SQLModel, table=True):
-    """Unified school catalog specifying weighted modules."""
+    """Unified university catalog specifying weighted academic modules."""
     id: Optional[int] = Field(default=None, primary_key=True)
     course_code: str = Field(unique=True, index=True) # e.g., "CS-601"
     title: str
     credit_hours: int
-    academic_level: str # Match filtering for B.Sc. or M.Sc. tracks
+    academic_level: str # Match filtering for B.Sc., M.Sc., Diploma, HND tracks
+
 
 class CourseAllocation(SQLModel, table=True):
     """
     Decoupled Cross-Level Routing Bridge.
-    Maps a FacultyProfile to multiple Courses across different academic levels.
+    Maps a FacultyProfile instructor to multiple Courses across domains.
     """
     id: Optional[int] = Field(default=None, primary_key=True)
     faculty_id: str = Field(foreign_key="facultyprofile.faculty_id", index=True)
     course_code: str = Field(foreign_key="course.course_code", index=True)
     semester: int
 
+
 class Enrollment(SQLModel, table=True):
-    """Relational bridge connecting a single Student to a single Course for a targeted term."""
+    """Relational bridge connecting a single Student to a single Course."""
     id: Optional[int] = Field(default=None, primary_key=True)
     student_id: str = Field(foreign_key="studentprofile.student_id", index=True)
     course_code: str = Field(foreign_key="course.course_code", index=True)
     semester: int
+
 
 class Grade(SQLModel, table=True):
     """
@@ -58,10 +118,10 @@ class Grade(SQLModel, table=True):
     """
     id: Optional[int] = Field(default=None, primary_key=True)
     enrollment_id: int = Field(foreign_key="enrollment.id", unique=True, index=True)
-    continuous_assessment: float = Field(default=0.0) # Max 40
-    final_exam: float = Field(default=0.0) # Max 60
-    total_score: float = Field(default=0.0) # Max 100
+    continuous_assessment: float = Field(default=0.0) 
+    final_exam: float = Field(default=0.0) 
+    total_score: float = Field(default=0.0) 
     letter_grade: str = Field(default="Not Graded")
     
-    # EXAM OFFICE GATES: If False, student sees "Awaiting Board Release" placeholder layout
+    # EXAM OFFICE GATES: Control flag for board verification clearance
     is_released: bool = Field(default=False)
