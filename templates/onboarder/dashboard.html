@@ -6,6 +6,13 @@
     <title>Bright Moon University - Registrar Command Desk</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #idCardModal, #printableIDCard, #printableIDCard * { visibility: visible; }
+            #printableIDCard { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%) scale(1.3); border: none; box-shadow: none; }
+        }
+    </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans antialiased flex flex-col md:flex-row">
 
@@ -131,6 +138,19 @@
                     </div>
 
                     <form onsubmit="fireCRUDAction(event, '/api/v1/onboard/student')" class="space-y-4">
+                        
+                        <!-- 📸 STUDENT PORTRAIT PHOTO UPLOAD -->
+                        <div class="col-span-full flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
+                            <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 relative shadow-sm">
+                                <i class="fa-solid fa-camera text-slate-400 text-lg absolute z-0"></i>
+                                <img id="preview-img-student" src="" class="w-full h-full object-cover relative z-10 hidden" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Official Passport Photograph</label>
+                                <input type="file" accept="image/*" onchange="previewAvatar(this, 'preview-img-student')" required class="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-wider file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition-all">
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-3 gap-4">
                             <div class="col-span-2">
                                 <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Legal Full Name</label>
@@ -232,6 +252,19 @@
                     </div>
 
                     <form onsubmit="fireCRUDAction(event, '/api/v1/onboard/staff')" class="space-y-4">
+                        
+                        <!-- 📸 STAFF/FACULTY PORTRAIT PHOTO UPLOAD -->
+                        <div class="col-span-full flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
+                            <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 relative shadow-sm">
+                                <i class="fa-solid fa-camera text-slate-400 text-lg absolute z-0"></i>
+                                <img id="preview-img-staff" src="" class="w-full h-full object-cover relative z-10 hidden" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Official Faculty Portrait</label>
+                                <input type="file" accept="image/*" onchange="previewAvatar(this, 'preview-img-staff')" required class="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-wider file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer transition-all">
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-3 gap-4">
                             <div class="col-span-2">
                                 <label class="block text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Official Full Name</label>
@@ -388,39 +421,355 @@
         </div>
     </div>
 
+    <!-- 🪪 MODERN LIGHT ID CARD GENERATOR MODAL -->
+    <div id="idCardModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="w-full max-w-sm animate-fadeIn">
+            
+            <!-- The Card Layout -->
+            <div id="printableIDCard" class="bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-200 relative">
+                
+                <!-- School Ribbon Header -->
+                <div id="idCardHeader" class="bg-blue-600 p-5 text-center relative overflow-hidden transition-colors duration-300">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
+                    <div class="flex items-center justify-center gap-2 text-white mb-1 relative z-10">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                        <h2 class="font-black tracking-widest uppercase text-xs">Bright Moon University</h2>
+                    </div>
+                    <p class="text-[8px] font-mono text-white/80 tracking-widest uppercase relative z-10">Official Verified Identification</p>
+                </div>
+                
+                <!-- Card Body Profile -->
+                <div class="p-6 flex flex-col items-center text-center relative bg-white">
+                    <!-- Avatar Window Frame -->
+                    <div class="w-24 h-24 rounded-2xl bg-slate-100 border-4 border-white shadow-md -mt-14 overflow-hidden relative z-10 flex items-center justify-center">
+                        <img id="idCardImage" src="" class="w-full h-full object-cover" />
+                    </div>
+                    
+                    <div class="mt-4 w-full">
+                        <h3 id="idCardName" class="text-base font-black text-slate-800 uppercase tracking-wide">User Full Name</h3>
+                        <p id="idCardRole" class="text-[11px] font-bold text-blue-600 uppercase tracking-wider mt-0.5">Role / Position</p>
+                        
+                        <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-left">
+                            <div>
+                                <span class="text-[8px] uppercase font-bold text-slate-400 block tracking-wider">Department</span>
+                                <span id="idCardDept" class="text-xs font-bold text-slate-700 truncate block">Department Name</span>
+                            </div>
+                            <div>
+                                <span id="idCardIdLabel" class="text-[8px] uppercase font-bold text-slate-400 block tracking-wider">Admission No</span>
+                                <span id="idCardNumber" class="text-xs font-mono font-black text-slate-900 block">00000000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Bar Footer -->
+                <div class="bg-slate-50 p-2.5 text-center border-t border-slate-100 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-qrcode text-slate-400 text-xs"></i>
+                    <p class="text-[8px] text-slate-400 font-mono uppercase tracking-widest">System Secure Digital Badge</p>
+                </div>
+            </div>
+
+            <!-- Card Controls -->
+            <div class="mt-4 flex gap-3">
+                <button onclick="window.print()" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs py-3 rounded-xl border border-slate-200 transition-all flex justify-center items-center gap-2 uppercase tracking-wide cursor-pointer shadow-sm">
+                    <i class="fa-solid fa-print"></i> Print ID
+                </button>
+                <button onclick="document.getElementById('idCardModal').classList.add('hidden')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-3 rounded-xl transition-all flex justify-center items-center gap-2 uppercase tracking-wide cursor-pointer shadow-md">
+                    <i class="fa-solid fa-circle-check"></i> Done
+                </button>
+            </div>
+        </div>
+    </div>
+<!-- TEST TO SE SEE WHETHER THE I.D CARD CAN BE PRINTED HERE OR NOT -->
+<style>
+    @media print {
+        body * { visibility: hidden; }
+        #idCardModal { background: white !important; }
+        #printableIDCard, #printableIDCard * { visibility: visible; }
+        #printableIDCard { position: absolute; left: 50%; top: 10%; transform: translateX(-50%) scale(1.2); box-shadow: none !important; border: 1px solid #ccc; }
+        button { display: none !important; }
+    }
+</style>
     <!-- 🌐 INTEGRATED DASHBOARD MATRIX CONTROLLER PIPELINE -->
     <script>
         let globalInstitutionalMap = {};
+
+        // Define the api endpointUrl path  here 
+
+        const API_ENDPOINTS = {
+            students : "/api/v1/onboard/student", 
+            faculty: "/api/v1/onboard/faculty",
+            staff: "/api/v1/onboard/staff"
+        };
+
+        // 1. Convert uploaded image to Base64 instantly
+function previewAvatar(input, imgId) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById(imgId);
+            img.src = e.target.result;
+            img.classList.remove('hidden');
+            // Attach the base64 string to the parent form dataset
+            input.closest('form').dataset.b64 = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// 2. Map backend response data to the ID Card Modal
+function populateIDCard(data, type) {
+    document.getElementById('idCardImage').src = data.passport_b64;
+    document.getElementById('idCardName').innerText = data.name;
+    document.getElementById('idCardDept').innerText = data.department;
+    document.getElementById('idCardNumber').innerText = data.generated_id;
+
+    const roleElement = document.getElementById('idCardRole');
+    const headerTheme = document.getElementById('idCardHeader');
+
+    // Smart styling based on user type
+    if (type === 'student') {
+        roleElement.innerText = `Student • ${data.level}`;
+        roleElement.className = "text-xs font-bold text-blue-600 uppercase tracking-wider mt-0.5";
+        headerTheme.className = "bg-blue-600 p-5 text-center relative overflow-hidden";
+    } else {
+        roleElement.innerText = `Staff • ${data.role}`;
+        roleElement.className = "text-xs font-bold text-emerald-600 uppercase tracking-wider mt-0.5";
+        headerTheme.className = "bg-emerald-600 p-5 text-center relative overflow-hidden";
+    }
+
+    document.getElementById('idCardModal').classList.remove('hidden');
+}
+
+// 3. Update fireCRUDAction to catch the Base64 image and show the ID card
+async function fireCRUDAction(event, endpointUrl) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    // Inject the base64 image into the submission payload
+    if (form.dataset.b64) {
+        formData.append('passport_b64', form.dataset.b64);
+    }
+
+    const alertBox = document.getElementById('responseAlert');
+    // ... [keep your existing alertBox logic here] ...
+
+    try {
+        const response = await fetch(endpointUrl, { method: 'POST', body: formData });
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Show Success Notification
+            alertBox.className = "p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
+            document.getElementById('alertIcon').innerHTML = '<i class="fa-solid fa-square-check text-xl text-emerald-600"></i>';
+            document.getElementById('alertTitle').innerText = "Profile & Credentials Dispatched";
+            document.getElementById('alertBody').innerHTML = `ASSIGNED ID: <strong>${data.generated_id}</strong><br>An automated email with login credentials and a digital copy of this ID has been sent to <strong>${data.email}</strong>.`;
+            
+            // Determine type and Trigger ID Card!
+            const type = endpointUrl.includes('student') ? 'student' : 'staff';
+            populateIDCard(data, type);
+            
+            form.reset();
+            form.dataset.b64 = ""; // clear memory
+            document.getElementById('preview-img-student').classList.add('hidden'); // hide preview
+        } else {
+            throw new Error(data.detail || "Server rejected submission.");
+        }
+    } catch (err) {
+        // ... [keep your existing error logic here] ...
+    }
+}
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => {
                 el.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-50 cursor-pointer";
             });
-
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-
+            
+            const activeContent = document.getElementById(`tab-${tabId}`);
+            if (activeContent) activeContent.classList.remove('hidden');
+            
             const activeBtn = document.getElementById(`btn-${tabId}`);
-            if (tabId === 'purge-zone') {
-                activeBtn.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-rose-600 bg-rose-50 border-l-2 border-rose-600 cursor-pointer";
-            } else {
-                activeBtn.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-blue-600 bg-blue-50/80 border-l-2 border-blue-600 cursor-pointer";
+            if (activeBtn) {
+                if (tabId === 'purge-zone') {
+                    activeBtn.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-rose-600 bg-rose-50/80 border-l-2 border-rose-600 cursor-pointer";
+                } else {
+                    activeBtn.className = "w-full tab-btn text-xs font-bold px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-blue-600 bg-blue-50/80 border-l-2 border-blue-600 cursor-pointer";
+                }
             }
 
-            const titleMap = {
-                'overview': 'Portal Overview Monitor',
-                'add-student': 'Admissions Operations (Student Registry)',
-                'add-staff': 'Appointments Desk (Staff Profile Onboarding)',
-                'view-records': 'Institutional Directory Ledger Control Room',
-                'purge-zone': 'Registry Settings & Governance Access Keys'
+            // Simple title updater conversion
+            const titles = {
+                'overview': 'Portal Overview',
+                'add-student': 'Admissions Ledger',
+                'add-staff': 'Appointments Desk',
+                'view-records': 'Global Folders',
+                'purge-zone': 'Registry Settings'
             };
-            document.getElementById('view-title').innerText = titleMap[tabId];
+            document.getElementById('view-title').innerText = titles[tabId] || 'Command Panel';
+            
+            if (tabId === 'view-records') {
+                refreshDirectories();
+            }
+        }
 
-            if (tabId === 'view-records') { fetchInstitutionalRecords(); }
+        function previewAvatar(input, imgId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(imgId);
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    input.closest('form').dataset.b64Image = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function renderDigitalIDCard(record, type) {
+
+    console.log("Backend response:", record);
+
+    // Profile image
+    document.getElementById('idCardImage').src =
+        record.passport_b64 || "https://via.placeholder.com/150";
+
+    // Main information
+    document.getElementById('idCardName').innerText =
+        record.name || record.student_name || record.staff_name || "UNKNOWN";
+
+    document.getElementById('idCardDept').innerText =
+        record.department ||
+        record.course_specialization ||
+        "GENERAL STUDIES";
+
+    document.getElementById('idCardNumber').innerText =
+        record.generated_id;
+
+    const roleTag = document.getElementById('idCardRole');
+    const headerElement = document.getElementById('idCardHeader');
+    const idLabelTag = document.getElementById('idCardIdLabel');
+
+    if (type === "student") {
+
+        roleTag.innerText =
+            `Student • ${record.level || record.academic_level || ""}`;
+
+        roleTag.className =
+            "text-[11px] font-bold text-blue-600 uppercase tracking-wider mt-0.5";
+
+        idLabelTag.innerText = "Admission No";
+
+        headerElement.className =
+            "bg-blue-600 p-5 text-center relative overflow-hidden";
+
+    } else {
+
+        roleTag.innerText =
+            record.role || record.assigned_role || "Staff";
+
+        roleTag.className =
+            "text-[11px] font-bold text-emerald-600 uppercase tracking-wider mt-0.5";
+
+        idLabelTag.innerText = "Employment Code";
+
+        headerElement.className =
+            "bg-emerald-600 p-5 text-center relative overflow-hidden";
+    }
+
+    document.getElementById('idCardModal')
+        .classList.remove('hidden');
+}
+        async function fireCRUDAction(event, endpointUrl) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            if (form.dataset.b64Image) {
+                formData.append('passport_b64', form.dataset.b64Image);
+            }
+
+            try {
+                const response = await fetch(endpointUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('Success Status Secure', `Profile created with identifier: ${data.generated_id || 'OK'}`, 'bg-emerald-50 border-emerald-200 text-emerald-800', '<i class="fa-solid fa-circle-check text-emerald-500"></i>');
+                    
+                    const classificationType = endpointUrl.includes('student') ? 'student' : 'staff';
+                    renderDigitalIDCard(data, classificationType);
+                    
+                    form.reset();
+                    delete form.dataset.b64Image;
+                    ['preview-img-student', 'preview-img-staff'].forEach(id => {
+                        const img = document.getElementById(id);
+                        if (img) img.classList.add('hidden');
+                    });
+                } else {
+                    showAlert('Pipeline System Rejection', data.detail || 'An unexpected operation validation error occurred.', 'bg-rose-50 border-rose-200 text-rose-800', '<i class="fa-solid fa-triangle-exclamation text-rose-500"></i>');
+                }
+            } catch (err) {
+                // showAlert('Network Pipeline Fault', 'Could not establish connection to registry stream backend.', 'bg-rose-50 border-rose-200 text-rose-800', '<i class="fa-solid fa-wifi text-rose-500"></i>');
+                console.error("Real Error", err);
+                showAlert(
+                    'Network Pipeline Fault', 
+                    err.message,
+                    'bg-rose-50 border-rose-200 text-rose-800', 
+                    '<i class = "fa-solid fa-wifi- text-rose--500"></i>'
+                );
+            }
+        }
+
+        // --- HARDCODED CASCADING DICTIONARIES ---
+        const facultyDataMap = {
+            "Faculty of Computing & Applied Sciences": ["Computer Science & ML", "Cyber Security & Forensics", "Software Engineering"],
+            "Faculty of Engineering Technology": ["Mechanical Engineering", "Electrical & Grid Infrastructure", "Civil Systems Architecture"],
+            "Faculty of Management & Corporate Commerce": ["Business Admin", "Accounting & Audit Control", "Logistics & Supply Chain Management"]
+        };
+
+        function bootstrapFacultySelectors() {
+            const studentSelect = document.getElementById('studentFacultySelect');
+            if (!studentSelect) return;
+            
+            studentSelect.innerHTML = '<option value="">-- Choose Faculty Cluster --</option>';
+            Object.keys(facultyDataMap).forEach(fac => {
+                const opt = document.createElement('option');
+                opt.value = fac;
+                opt.innerText = fac;
+                studentSelect.appendChild(opt);
+            });
+        }
+
+        function cascadeDepartmentFilter(facultyValue, targetSelectId) {
+            const targetSelect = document.getElementById(targetSelectId);
+            if (!targetSelect) return;
+            
+            targetSelect.innerHTML = '<option value="">-- Choose Department Course --</option>';
+            if (facultyDataMap[facultyValue]) {
+                facultyDataMap[facultyValue].forEach(dept => {
+                    const opt = document.createElement('option');
+                    opt.value = dept;
+                    opt.innerText = dept;
+                    targetSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function toggleHostelFields(isChecked) {
+            const block = document.getElementById('hostelFieldsBlock');
+            if (!block) return;
+            block.classList.toggle('hidden', !isChecked);
+            document.getElementById('hostelBlock').required = isChecked;
+            document.getElementById('roomNumber').required = isChecked;
         }
 
         function toggleDirectorySubTab(type) {
-            if(type === 'student') {
+            if (type === 'student') {
                 document.getElementById('directory-student-block').classList.remove('hidden');
                 document.getElementById('directory-staff-block').classList.add('hidden');
                 document.getElementById('subbtn-student').className = "text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg bg-white text-blue-600 shadow-sm cursor-pointer transition-all";
@@ -433,199 +782,117 @@
             }
         }
 
-        // Fetch schema mapping parameters during dashboard startup boot
-        document.addEventListener("DOMContentLoaded", async () => {
+        async function refreshDirectories() {
             try {
-                const response = await fetch("/api/v1/onboard/faculties-map");
-                globalInstitutionalMap = await response.json();
+                const sRes = await fetch(API_ENDPOINTS.students);
+                const students = await sRes.json();
+                const sBody = document.getElementById('studentTableBody');
+                sBody.innerHTML = '';
                 
-                const studentFacultySelect = document.getElementById("studentFacultySelect");
-                const staffDeptSelect = document.getElementById("staffDeptSelect");
-                
-                for (const faculty in globalInstitutionalMap) {
-                    let option = new Option(faculty, faculty);
-                    studentFacultySelect.add(option);
-                    
-                    globalInstitutionalMap[faculty].forEach(dept => {
-                        let staffOpt = new Option(`Academic: ${dept}`, dept);
-                        staffDeptSelect.add(staffOpt);
-                    });
-                }
-            } catch (err) {
-                console.error("Critical Failure: Could not bind cascade maps.", err);
-            }
-        });
+                Object.keys(students).forEach(key => {
+                    globalInstitutionalMap[key] = students[key];
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-50/80 transition-colors";
+                    row.innerHTML = `
+                        <td class="py-3 px-4 font-bold text-blue-600 select-all">${key}</td>
+                        <td class="py-3 px-4 text-slate-900 font-sans font-medium">${students[key].name}</td>
+                        <td class="py-3 px-4 text-slate-500 font-sans">${students[key].department}</td>
+                        <td class="py-3 px-4"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold font-sans">${students[key].level || 'Degree'}</span></td>
+                        <td class="py-3 px-4 text-right"><button onclick="openInspectModal('${key}')" class="text-blue-600 hover:text-blue-800 text-[11px] font-bold font-sans border border-slate-200 bg-white px-2.5 py-1 rounded-lg hover:shadow-sm cursor-pointer transition-all">Inspect dossier</button></td>
+                    `;
+                    sBody.appendChild(row);
+                });
 
-        // Pull active entries safely from local database tables
-        async function fetchInstitutionalRecords() {
-            try {
-                const response = await fetch("/api/v1/onboard/records");
-                const records = await response.json();
+                const fRes = await fetch(API_ENDPOINTS.staff);
+                const staff = await fRes.json();
+                const fBody = document.getElementById('staffTableBody');
+                fBody.innerHTML = '';
 
-                // Populate Student Sub-ledger rows
-                const studentBody = document.getElementById("studentTableBody");
-                studentBody.innerHTML = records.students.length === 0 
-                    ? `<tr><td colspan="5" class="py-4 text-center text-slate-400 font-sans italic">No students registered in this cluster yet.</td></tr>`
-                    : records.students.map(s => `
-                        <tr class="hover:bg-slate-50/80 transition-all border-b border-slate-100">
-                            <td class="py-3 px-4 font-bold text-blue-600">${s.generated_id}</td>
-                            <td class="py-3 px-4 text-slate-900 font-sans font-medium">${s.name}</td>
-                            <td class="py-3 px-4 text-[11px]">${s.faculty} / ${s.department}</td>
-                            <td class="py-3 px-4"><span class="bg-slate-100 text-slate-600 font-sans px-2 py-0.5 rounded border border-slate-200 text-[11px]">${s.level}</span></td>
-                            <td class="py-3 px-4 text-right">
-                                <button onclick="inspectRowRecord('student', '${s.generated_id}')" class="text-[11px] font-bold bg-white text-blue-600 border border-slate-200 hover:border-blue-300 px-2.5 py-1 rounded-lg cursor-pointer shadow-sm transition-all"><i class="fa-solid fa-eye"></i> View</button>
-                            </td>
-                        </tr>
-                    `).join('');
-
-                // Populate Staff Sub-ledger rows
-                const staffBody = document.getElementById("staffTableBody");
-                staffBody.innerHTML = records.staff.length === 0
-                    ? `<tr><td colspan="5" class="py-4 text-center text-slate-400 font-sans italic">No staff profiles provisioned yet.</td></tr>`
-                    : records.staff.map(st => `
-                        <tr class="hover:bg-slate-50/80 transition-all border-b border-slate-100">
-                            <td class="py-3 px-4 font-bold text-emerald-600">${st.generated_id}</td>
-                            <td class="py-3 px-4 text-slate-900 font-sans font-medium">${st.name}</td>
-                            <td class="py-3 px-4 text-[11px]">${st.department}</td>
-                            <td class="py-3 px-4 text-slate-500 font-sans font-medium">${st.role}</td>
-                            <td class="py-3 px-4 text-right">
-                                <button onclick="inspectRowRecord('staff', '${st.generated_id}')" class="text-[11px] font-bold bg-white text-emerald-600 border border-slate-200 hover:border-emerald-300 px-2.5 py-1 rounded-lg cursor-pointer shadow-sm transition-all"><i class="fa-solid fa-eye"></i> View</button>
-                            </td>
-                        </tr>
-                    `).join('');
-
-            } catch (err) {
-                console.error("Failed to read server live data registers.", err);
-            }
+                Object.keys(staff).forEach(key => {
+                    globalInstitutionalMap[key] = staff[key];
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-50/80 transition-colors";
+                    row.innerHTML = `
+                        <td class="py-3 px-4 font-bold text-emerald-600 select-all">${key}</td>
+                        <td class="py-3 px-4 text-slate-900 font-sans font-medium">${staff[key].name}</td>
+                        <td class="py-3 px-4 text-slate-500 font-sans">${staff[key].department}</td>
+                        <td class="py-3 px-4 text-slate-600 font-sans font-medium">${staff[key].role}</td>
+                        <td class="py-3 px-4 text-right"><button onclick="openInspectModal('${key}')" class="text-emerald-600 hover:text-emerald-800 text-[11px] font-bold font-sans border border-slate-200 bg-white px-2.5 py-1 rounded-lg hover:shadow-sm cursor-pointer transition-all">Inspect dossier</button></td>
+                    `;
+                    fBody.appendChild(row);
+                });
+            } catch(e){}
         }
 
-        // Fire single object target inspection modals lookup queries
-        async function inspectRowRecord(type, entityId) {
-            try {
-                const response = await fetch(`/api/v1/onboard/record/${type}/${entityId}`);
-                if (!response.ok) throw new Error("Could not load target file records mapping.");
-                const data = await response.json();
+        function openInspectModal(key) {
+            const data = globalInstitutionalMap[key];
+            if (!data) return;
+            
+            document.getElementById('inspectTitle').innerText = `Dossier: ${key}`;
+            const container = document.getElementById('inspectContainer');
+            container.innerHTML = '';
 
-                document.getElementById('inspectTitle').innerText = `${type.toUpperCase()} PROFILE DOSSIER: ${entityId}`;
-                const container = document.getElementById('inspectContainer');
-                
-                let detailsHtml = `
-                    <div class="grid grid-cols-2 gap-y-3 gap-x-4 border border-slate-200 p-4 rounded-xl bg-slate-50 font-sans">
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Full Legal Name</span><strong class="text-xs text-slate-800">${data.name}</strong></div>
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Age / Gender</span><strong class="text-xs text-slate-800">${data.age} Yrs / ${data.sex}</strong></div>
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Mobile Link</span><strong class="text-xs text-slate-800 font-mono">${data.phone}</strong></div>
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Email Address</span><strong class="text-xs text-slate-800 break-all font-mono">${data.email}</strong></div>
+            if (data.passport_b64) {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = "flex justify-center mb-4";
+                imgDiv.innerHTML = `<img src="${data.passport_b64}" class="w-24 h-24 rounded-2xl object-cover border-2 border-slate-200 shadow-sm" />`;
+                container.appendChild(imgDiv);
+            }
+
+            Object.keys(data).forEach(field => {
+                if (field === 'passport_b64') return;
+                const div = document.createElement('div');
+                div.className = "border-b border-slate-100 pb-1.5";
+                div.innerHTML = `
+                    <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400 block">${field.replace('_',' ')}</span>
+                    <span class="text-xs text-slate-800 font-mono select-all">${data[field]}</span>
                 `;
-
-                if(type === 'student') {
-                    detailsHtml += `
-                        <div class="col-span-2 border-t border-slate-200 pt-2"><span class="text-[10px] text-slate-400 uppercase block font-bold">Faculty Anchor</span><strong class="text-xs text-slate-800">${data.faculty} (${data.department})</strong></div>
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Degree Tier</span><strong class="text-xs text-slate-800">${data.level}</strong></div>
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Hostel Resident</span><strong class="text-xs text-slate-800">${data.is_boarding ? `<i class="fa-solid fa-hotel text-blue-600"></i> ${data.hostel_block} - ${data.room_number}` : 'Off-Campus'}</strong></div>
-                        <div class="col-span-2 border-t border-slate-200 pt-2 bg-blue-50/50 p-2 rounded-lg border border-blue-100">
-                            <span class="text-[9px] text-blue-600 uppercase block font-black tracking-wider"><i class="fa-solid fa-shield-heart"></i> Next of Kin Contact</span>
-                            <p class="text-xs text-slate-700 mt-0.5 font-medium">${data.guardian_name} (${data.guardian_relation})</p>
-                            <p class="text-[11px] font-mono text-slate-500 mt-0.5">${data.guardian_phone}</p>
-                        </div>
-                    `;
-                } else {
-                    detailsHtml += `
-                        <div class="col-span-2 border-t border-slate-200 pt-2"><span class="text-[10px] text-slate-400 uppercase block font-bold">Department / Division</span><strong class="text-xs text-slate-800">${data.department}</strong></div>
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Appointed Position</span><strong class="text-xs text-slate-800">${data.role}</strong></div>
-                        <div><span class="text-[10px] text-slate-400 uppercase block font-bold">Office Desk Cabin</span><strong class="text-xs text-slate-800">${data.cabin}</strong></div>
-                    `;
-                }
-
-                detailsHtml += `</div>`;
-                container.innerHTML = detailsHtml;
-                document.getElementById('inspectModal').classList.remove('hidden');
-            } catch (err) {
-                alert("Could not load target asset records profile logs: " + err.message);
-            }
-        }
-
-        function closeInspectModal() { document.getElementById('inspectModal').classList.add('hidden'); }
-        function cascadeDepartmentFilter(selectedFaculty, targetDropdownId) {
-            const deptDropdown = document.getElementById(targetDropdownId);
-            deptDropdown.length = 0; 
-            if (!selectedFaculty || !globalInstitutionalMap[selectedFaculty]) {
-                deptDropdown.add(new Option("-- Awaiting Faculty Options --", ""));
-                return;
-            }
-            globalInstitutionalMap[selectedFaculty].forEach(department => {
-                deptDropdown.add(new Option(department, department));
+                container.appendChild(div);
             });
+
+            document.getElementById('inspectModal').classList.remove('hidden');
         }
 
-        function toggleHostelFields(isChecked) {
-            const block = document.getElementById("hostelFieldsBlock");
-            if (isChecked) { block.classList.remove("hidden"); } else { block.classList.add("hidden"); }
-        }
-
-        async function fireCRUDAction(event, endpointUrl) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const alertBox = document.getElementById('responseAlert');
-            const alertIcon = document.getElementById('alertIcon');
-            const alertTitle = document.getElementById('alertTitle');
-            const alertBody = document.getElementById('alertBody');
-
-            try {
-                const response = await fetch(endpointUrl, { method: 'POST', body: formData });
-                const data = await response.json();
-                
-                if (response.ok) {
-                    alertBox.className = "p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
-                    alertIcon.innerHTML = '<i class="fa-solid fa-square-check text-xl text-emerald-600"></i>';
-                    alertTitle.innerText = "Identity Profile Generated Smoothly";
-                    alertBody.innerHTML = `ASSIGNED ACCESS ID: <strong class="text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">${data.generated_id}</strong><br>TEMPORARY ENCRYPTED PASSWORD: <strong class="text-slate-900">Password123</strong>`;
-                    form.reset();
-                    toggleHostelFields(false);
-                } else {
-                    throw new Error(data.detail || "Server request processing rejection triggered.");
-                }
-            } catch (err) {
-                alertBox.className = "p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
-                alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xl text-rose-600"></i>';
-                alertTitle.innerText = "Operation Aborted";
-                alertBody.innerText = err.message;
-            }
+        function closeInspectModal() {
+            document.getElementById('inspectModal').classList.add('hidden');
         }
 
         async function executePurgeRequest() {
-            const targetInput = document.getElementById("purgeUserId");
-            const userId = targetInput.value.trim().toUpperCase();
-            if(!userId) return;
-            if(!confirm(`Confirm absolute account purge target: ${userId}?`)) return;
-
-            const alertBox = document.getElementById('responseAlert');
-            const alertIcon = document.getElementById('alertIcon');
-            const alertTitle = document.getElementById('alertTitle');
-            const alertBody = document.getElementById('alertBody');
+            const idInput = document.getElementById('purgeUserId').value.trim();
+            if(!idInput) return;
+            
+            if(!confirm(`⚠️ CRITICAL CONFIRMATION\nAre you sure you want to completely purge and delete record ${idInput}?`)) return;
 
             try {
-                const response = await fetch(`/api/v1/onboard/delete/${userId}`, { method: 'DELETE' });
+                const response = await fetch(`/api/v1/purge/${idInput}`, { method: 'DELETE' });
                 const data = await response.json();
                 
                 if (response.ok) {
-                    alertBox.className = "p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
-                    alertIcon.innerHTML = '<i class="fa-solid fa-trash-can text-xl text-rose-600"></i>';
-                    alertTitle.innerText = "Purge Execution Sequence Finalized";
-                    alertBody.innerText = data.message;
-                    targetInput.value = "";
+                    showAlert('Record Completely Purged', `Identifier ${idInput} is permanently deleted from servers.`, 'bg-slate-900 border-slate-800 text-slate-200', '<i class="fa-solid fa-dumpster-fire text-rose-500"></i>');
+                    document.getElementById('purgeUserId').value = '';
                 } else {
-                    throw new Error(data.detail || "Error running account processing purge.");
+                    showAlert('Purge Operation Denied', data.detail || 'Target database record identifier mismatch.', 'bg-rose-50 border-rose-200 text-rose-800', '<i class="fa-solid fa-circle-xmark text-rose-500"></i>');
                 }
-            } catch (err) {
-                alertBox.className = "p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-3.5 shadow-sm animate-fadeIn";
-                alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xl text-rose-600"></i>';
-                alertTitle.innerText = "Purge Sequence Cancelled";
-                alertBody.innerText = err.message;
-            }
+            } catch(e){}
         }
 
-        function closeAlert() { document.getElementById('responseAlert').className = "hidden"; }
+        function showAlert(title, body, classes, iconHtml) {
+            const box = document.getElementById('responseAlert');
+            box.className = `p-4 rounded-xl border flex items-start gap-3.5 transition-all shadow-md animate-fadeIn ${classes}`;
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertBody').innerText = body;
+            document.getElementById('alertIcon').innerHTML = iconHtml;
+            box.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeAlert() {
+            document.getElementById('responseAlert').classList.add('hidden');
+        }
+
+        window.onload = function() {
+            bootstrapFacultySelectors();
+        };
     </script>
 </body>
 </html>

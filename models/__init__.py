@@ -2,5 +2,4 @@
 Expose database models to ensure smooth engine initialization.
 """
 from .auth import UserAccount
-from .academic import StudentProfile, FacultyProfile, Course, CourseAllocation, Enrollment, Grade
-from .auxiliary import LmsResource, ServiceRequest
+from .academic import StudentProfile, FacultyProfile, SupportStaffProfile, Course, CourseAllocation, Enrollment, Grade, LmsResource, ServiceRequest

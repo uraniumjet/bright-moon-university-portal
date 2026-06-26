@@ -125,3 +125,236 @@ class Grade(SQLModel, table=True):
     
     # EXAM OFFICE GATES: Control flag for board verification clearance
     is_released: bool = Field(default=False)
+
+# =========================================================================
+# LEARNING MANAGEMENT SYSTEM (LMS)
+# =========================================================================
+
+class LmsResource(SQLModel, table=True):
+    """
+    Digital learning materials repository.
+    Faculty members upload resources mapped to courses.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    course_code: str = Field(
+        foreign_key="course.course_code",
+        index=True
+    )
+
+    uploaded_by: str = Field(
+        foreign_key="facultyprofile.faculty_id",
+        index=True
+    )
+
+    title: str
+
+    resource_type: str
+    # PDF, VIDEO, ASSIGNMENT, SLIDE, NOTE
+
+    description: str = ""
+
+    file_path: str
+
+    week_number: int = Field(default=1)
+
+    is_visible: bool = Field(default=True)
+
+
+# =========================================================================
+# STUDENT FINANCIAL CLEARANCE
+# =========================================================================
+
+class FinancialClearance(SQLModel, table=True):
+    """
+    Determines whether a student may register courses,
+    sit examinations or graduate.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    student_id: str = Field(
+        foreign_key="studentprofile.student_id",
+        unique=True,
+        index=True
+    )
+
+    is_cleared: bool = Field(default=False)
+
+    clearance_note: str = ""
+
+# =========================================================================
+# SERVICE REQUEST MANAGEMENT ENGINE
+# =========================================================================
+
+class ServiceRequest(SQLModel, table=True):
+    """
+    Centralized institutional service desk.
+    Handles all non-academic requests from students,
+    faculty and staff.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    requester_id: str = Field(index=True)
+
+    requester_type: str
+    # Student
+    # Faculty
+    # Staff
+
+    request_type: str
+    # Transcript
+    # ID Replacement
+    # Hostel Transfer
+    # Add/Drop Course
+    # Recommendation Letter
+    # Complaint
+
+    title: str
+
+    description: str
+
+    status: str = Field(default="Pending")
+    # Pending
+    # Processing
+    # Completed
+    # Rejected
+
+    assigned_department: str
+
+    response_note: str = ""
+
+    created_at: str
+
+# =========================================================================
+# UNIVERSITY NOTICE BOARD
+# =========================================================================
+
+class Announcement(SQLModel, table=True):
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    title: str
+
+    message: str
+
+    audience: str
+    # Students
+    # Faculty
+    # Staff
+    # All
+
+    posted_by: str
+
+    created_at: str
+# =========================================================================
+# HOSTEL OCCUPANCY MATRIX
+# =========================================================================
+
+class HostelRoom(SQLModel, table=True):
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    hostel_block: str
+
+    room_number: str
+
+    capacity: int
+
+    occupied_count: int = Field(default=0)
+
+    room_status: str = "Available"
+
+
+# =========================================================================
+# ATTENDANCE LEDGER
+# =========================================================================
+
+class Attendance(SQLModel, table=True):
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    student_id: str = Field(
+        foreign_key="studentprofile.student_id",
+        index=True
+    )
+
+    course_code: str = Field(
+        foreign_key="course.course_code",
+        index=True
+    )
+
+    attendance_percentage: float = Field(default=100.0)
+
+
+# =========================================================================
+# STUDENT FINANCIAL INVOICE LEDGER
+# =========================================================================
+
+class Invoice(SQLModel, table=True):
+    """
+    Financial obligations assigned to students.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    invoice_reference: str = Field(
+        unique=True,
+        index=True
+    )
+
+    student_id: str = Field(
+        foreign_key="studentprofile.student_id",
+        index=True
+    )
+
+    description: str
+
+    amount_due: float
+
+    amount_paid: float = Field(default=0.0)
+
+    semester: int
+
+    session_year: str
+
+    status: str = Field(default="Pending")
+    # Pending
+    # Partial
+    # Paid
+
+# =========================================================================
+# PAYMENT TRANSACTION LEDGER
+# =========================================================================
+
+class Payment(SQLModel, table=True):
+    """
+    Immutable payment transaction records.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    transaction_reference: str = Field(
+        unique=True,
+        index=True
+    )
+
+    invoice_reference: str = Field(
+        foreign_key="invoice.invoice_reference",
+        index=True
+    )
+
+    student_id: str = Field(
+        foreign_key="studentprofile.student_id",
+        index=True
+    )
+
+    amount_paid: float
+
+    payment_channel: str
+
+    payment_date: str
+
+

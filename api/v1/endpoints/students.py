@@ -7,7 +7,7 @@ Description: Handles document delivery pipelines and auxiliary campus service re
 from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException, status
 from sqlmodel import Session
 from database.connection import get_session
-from models.auxiliary import ServiceRequest
+from models.academic import ServiceRequest
 import os
 
 router = APIRouter(prefix="/student", tags=["Student Workspace Services"])
